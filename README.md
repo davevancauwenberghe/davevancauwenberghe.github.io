@@ -5,7 +5,6 @@
 [![HTML](https://img.shields.io/badge/HTML-5-orange?logo=html5&logoColor=white&style=flat-square)](#)
 [![CSS](https://img.shields.io/badge/CSS-3-blue?logo=css3&logoColor=white&style=flat-square)](#)
 [![License](https://img.shields.io/github/license/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](LICENSE)
-[![Repo Size](https://img.shields.io/github/repo-size/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io)
 ![GitHub Stars](https://img.shields.io/github/stars/davevancauwenberghe/davevancauwenberghe.github.io)
 
 > **A terminal-inspired GitHub Pages**  
