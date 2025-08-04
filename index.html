@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Terminal interface of Dave Van Cauwenberghe – indie dev in Ghent."/>
   <title>davevancauwenberghe – Terminal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,25 +11,25 @@
 
 <!-- Boot screen -->
 <div id="boot-screen">
-  <img src="https://via.placeholder.com/120x120.png?text=LOGO" alt="Dave's Logo" />
-  <div class="boot-text">Booting up<span class="dot-loader"></span></div>
+  <pre class="ascii-logo">
+      ___  _   __   ___  
+     | _ \| | / /  / _ \ 
+     | v /| |/ /__| (_) |
+     |_|_\|___/____\___/  .
+  </pre>
+  <div class="boot-text">Booting dvc<span class="dot-loader"></span></div>
 </div>
 
-<!-- Terminal interface -->
+<!-- Terminal UI -->
 <div id="terminal" style="display:none;">
   <div id="breadcrumbs">~</div>
+  <div id="system-time"></div>
   <div id="console-output"></div>
   <div class="input-line">
     <span>&gt;</span>
     <input type="text" id="console-input" autofocus autocomplete="off" />
   </div>
 </div>
-
-<!-- Sound Effects -->
-<audio id="boot-sound" src="sounds/boot.mp3"></audio>
-<audio id="beep-sound" src="sounds/beep.mp3"></audio>
-<audio id="open-sound" src="sounds/open.mp3"></audio>
-<audio id="error-sound" src="sounds/error.mp3"></audio>
 
 <script src="script.js"></script>
 </body>
