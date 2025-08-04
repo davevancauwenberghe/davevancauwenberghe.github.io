@@ -1,26 +1,20 @@
 # davevancauwenberghe.github.io
 
-> **A terminal-inspired GitHub Pages landing site for Dave Van Cauwenberghe.**  
-> Built with pure HTML, CSS, and JS — styled like an old-school CRT interface with sound and interactive commands.
-
----
-
-[![CodeQL](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions)
-[![License](https://img.shields.io/github/license/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](LICENSE)
-[![Repo Size](https://img.shields.io/github/repo-size/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io)
+[![CodeQL Advanced](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml)
+![JavaScript](https://img.shields.io/badge/Language-JavaScript-yellow.svg)
 [![HTML](https://img.shields.io/badge/HTML-5-orange?logo=html5&logoColor=white&style=flat-square)](#)
 [![CSS](https://img.shields.io/badge/CSS-3-blue?logo=css3&logoColor=white&style=flat-square)](#)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript&logoColor=black&style=flat-square)](#)
+[![License](https://img.shields.io/github/license/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](LICENSE)
+[![Repo Size](https://img.shields.io/github/repo-size/davevancauwenberghe/davevancauwenberghe.github.io?style=flat-square)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io)
 
----
+> **A terminal-inspired GitHub Pages**  
+> Built with pure HTML, CSS, and JS, styled like an old-school CRT interface with sound and interactive commands.
 
 ## 🖥️ Live Site
 
-👉 [https://davevancauwenberghe.github.io](https://davevancauwenberghe.github.io)
+[https://davevancauwenberghe.github.io](https://davevancauwenberghe.github.io)
 
-Accessible from mobile and desktop.
-
----
+> Accessible from mobile and desktop.
 
 ## ⌨️ Terminal Commands
 
@@ -33,7 +27,6 @@ clear / cls    # Clear the screen
 mute / soundoff # Toggle sound effects
 theme          # Toggle light/dark mode
 ```
----
 
 ## ⚙️ Tech Stack
 
@@ -43,15 +36,14 @@ theme          # Toggle light/dark mode
 - **GitHub Actions** – CodeQL security analysis  
 - **GitHub Pages** – for hosting
 
----
+## 🤝 Contributing
+
+Please make sure your code follows the existing style, includes documentation for any new or updated features, and passes any tests or CI checks before merging. See the [CONTRIBUTING](CONTRIBUTING.md) file for details.
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ## 🧠 Credits
 
-- Designed & coded by [@davevancauwenberghe](https://github.com/davevancauwenberghe)
 - Sound effects sourced from [Pixabay](https://pixabay.com/sound-effects/) (royalty-free)
-
----
-
-## 📜 License
-
-MIT - Feel free to use, fork, and tweak.
