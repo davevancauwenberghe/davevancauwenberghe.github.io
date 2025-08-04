@@ -1,1 +1,76 @@
-Test2
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Welcome to the digital console of Dave Van Cauwenberghe."/>
+  <title>davevancauwenberghe – Console</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 2rem;
+      white-space: pre-wrap;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      background-color: #00ff00;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%   { opacity: 1; }
+      50%  { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<span id="console"></span><span class="cursor"></span>
+
+<script>
+const lines = [
+  "Initializing personal console...",
+  "User: Dave Van Cauwenberghe",
+  "Location: Ghent, Belgium",
+  "Status: Indie dev + creative brain at dvc.",
+  "",
+  "Projects:",
+  "  - GP App          ▶ Photography meets UI design",
+  "  - Craftify        ▶ iOS app for Minecraft recipes",
+  "  - CityMart        ▶ Roblox supermarket experience",
+  "",
+  "Links:",
+  "  ▶ GitHub:       https://github.com/davevancauwenberghe",
+  "",
+  "Tip: type 'clear' in your mind if overwhelmed.",
+  "Console ready."
+];
+
+let i = 0;
+let consoleEl = document.getElementById('console');
+
+function typeLine() {
+  if (i < lines.length) {
+    consoleEl.innerHTML += lines[i] + '\n';
+    i++;
+    setTimeout(typeLine, 200);
+  }
+}
+
+typeLine();
+</script>
+</body>
+</html>
