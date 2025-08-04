@@ -139,3 +139,30 @@ body.light-mode .clickable {
     width: 100%;
   }
 }
+
+/* Name prompt */
+#name-prompt {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#name-prompt label {
+  margin-right: 0.5rem;
+}
+
+#user-name {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  font: inherit;
+  padding: 0.3rem 0.5rem;
+  outline: none;
+  width: 180px;
+}
+
+body.light-mode #user-name {
+  border-color: #003300;
+  color: #003300;
+}
