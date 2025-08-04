@@ -1,4 +1,3 @@
-// script.js
 const sounds = {
   boot: document.getElementById("boot-sound"),
   beep: document.getElementById("beep-sound"),
@@ -21,11 +20,11 @@ const input = document.getElementById("console-input");
 const breadcrumbs = document.getElementById("breadcrumbs");
 const terminal = document.getElementById("terminal");
 const bootScreen = document.getElementById("boot-screen");
-const clock = document.getElementById("system-time");
+const bootLogs = document.getElementById("boot-logs");
 const namePrompt = document.getElementById("name-prompt");
 const nameInput = document.getElementById("user-name");
+const clock = document.getElementById("system-time");
 
-// Boot logging sequence
 const bootMessages = [
   "▒▒ Initializing DVC Terminal BIOS v1.91 ▒▒",
   "▒▒ 640KB RAM | 8-bit Audio Enabled | ANSI MODE ▒▒",
@@ -35,7 +34,7 @@ const bootMessages = [
   "▒▒ Awaiting user authentication..."
 ];
 
-// Simulated file system
+// File system
 const fileSystem = {
   "~": {
     type: "folder",
@@ -63,7 +62,6 @@ const fileSystem = {
   }
 };
 
-// Utilities
 function writeLine(text = "") {
   const line = document.createElement("pre");
   line.textContent = text;
@@ -105,33 +103,28 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
-// Terminal logic
+// Directory
 function renderDir() {
   const node = getCurrentNode();
   writeLine();
   Object.entries(node.children).forEach(([name, val]) => {
-    const line = val.type === "folder" || typeof val === "object"
-      ? `- ${name}/`
-      : `• ${name}`;
+    const line = val.type === "folder" ? `- ${name}/` : `• ${name}`;
     const span = document.createElement("span");
     span.textContent = line;
     span.classList.add("clickable");
     span.onclick = () => {
-      if (val.type === "folder" || typeof val === "object") {
-        handleCommand(`cd ${name}`);
-      } else {
-        handleCommand(`open ${name}`);
-      }
+      if (val.type === "folder") handleCommand(`cd ${name}`);
+      else handleCommand(`open ${name}`);
     };
     output.appendChild(span);
     output.appendChild(document.createElement("br"));
   });
 }
 
+// Command parser
 function handleCommand(raw) {
   const [cmdRaw, ...args] = raw.trim().split(" ");
   const cmd = cmdRaw.toLowerCase();
-
   writeLine(`> ${raw}`);
   play("beep");
 
@@ -158,7 +151,7 @@ function handleCommand(raw) {
       if (!args[0]) return writeLine("Usage: cd <folder>");
       const newPath = `${currentDir}/${args[0]}`;
       const node = getNode(newPath);
-      if (node?.type === "folder" || typeof node === "object") {
+      if (node?.type === "folder") {
         currentDir = newPath;
         setBreadcrumbs();
         renderDir();
@@ -195,13 +188,9 @@ function handleCommand(raw) {
 
     case "mute":
     case "soundoff":
-    case "toggle":
       soundEnabled = !soundEnabled;
-      if (!soundEnabled) {
-        Object.values(sounds).forEach(s => s.pause?.());
-      } else {
-        sounds.hum.play();
-      }
+      if (!soundEnabled) Object.values(sounds).forEach(s => s.pause?.());
+      else sounds.hum.play();
       writeLine(`Sound ${soundEnabled ? "enabled" : "muted"}`);
       break;
 
@@ -222,23 +211,23 @@ function handleCommand(raw) {
   }
 }
 
-// Boot login logic
+// Boot log
 function bootLogSequence(callback) {
   let i = 0;
+  const log = document.getElementById("boot-logs");
   const interval = setInterval(() => {
     if (i < bootMessages.length) {
-      const line = document.createElement("div");
-      line.textContent = bootMessages[i++];
-      bootScreen.appendChild(line);
+      log.textContent += bootMessages[i++] + "\n";
     } else {
       clearInterval(interval);
       namePrompt.style.display = "block";
       nameInput.focus();
-      callback();
+      if (callback) callback();
     }
   }, 600);
 }
 
+// Terminal
 function initTerminal() {
   setTimeout(() => {
     bootScreen.style.display = "none";
@@ -254,7 +243,7 @@ function initTerminal() {
   }, 1000);
 }
 
-// Event listeners
+// Name prompt
 nameInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = nameInput.value.trim();
@@ -269,6 +258,7 @@ nameInput?.addEventListener("keydown", (e) => {
   }
 });
 
+// Terminal input
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = input.value.trim();
@@ -293,12 +283,9 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-// On load
+// Init
 window.addEventListener("load", () => {
   const stored = localStorage.getItem("dvc_username");
-  if (stored) {
-    initTerminal();
-  } else {
-    bootLogSequence(() => {});
-  }
+  if (stored) initTerminal();
+  else bootLogSequence();
 });
