@@ -3,240 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Terminal OS - davevancauwenberghe</title>
-  <style>
-    body {
-      background-color: #000;
-      color: #00ff00;
-      font-family: 'Courier New', Courier, monospace;
-      margin: 0;
-      padding: 2rem;
-      white-space: pre-wrap;
-      overflow-x: hidden;
-    }
-
-    #boot {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: black;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    #boot img {
-      width: 100px;
-      margin-bottom: 1rem;
-    }
-
-    .dot-loader::after {
-      content: '';
-      animation: dots 1.5s infinite steps(3, end);
-    }
-
-    @keyframes dots {
-      0%   { content: '.'; }
-      33%  { content: '..'; }
-      66%  { content: '...'; }
-      100% { content: '.'; }
-    }
-
-    input {
-      background: transparent;
-      border: none;
-      color: #00ff00;
-      font: inherit;
-      width: 90%;
-      outline: none;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 0.6em;
-      background-color: #00ff00;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    a {
-      color: #00ffff;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <title>davevancauwenberghe – Terminal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <!-- Boot screen -->
-<div id="boot">
-  <img src="https://via.placeholder.com/100x100.png?text=LOGO" alt="Logo" />
-  <span style="color:#00ff00">Booting up<span class="dot-loader"></span></span>
+<div id="boot-screen">
+  <img src="https://via.placeholder.com/120x120.png?text=LOGO" alt="Dave's Logo" />
+  <div class="boot-text">Booting up<span class="dot-loader"></span></div>
 </div>
 
-<!-- Terminal -->
-<div id="console" style="display:none;">
+<!-- Terminal interface -->
+<div id="terminal" style="display:none;">
+  <div id="breadcrumbs">~</div>
   <div id="console-output"></div>
-  <div>> <input id="console-input" autofocus autocomplete="off" /></div>
+  <div class="input-line">
+    <span>&gt;</span>
+    <input type="text" id="console-input" autofocus autocomplete="off" />
+  </div>
 </div>
 
-<!-- Beep sound -->
-<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<!-- Sound Effects -->
+<audio id="boot-sound" src="sounds/boot.mp3"></audio>
+<audio id="beep-sound" src="sounds/beep.mp3"></audio>
+<audio id="open-sound" src="sounds/open.mp3"></audio>
+<audio id="error-sound" src="sounds/error.mp3"></audio>
 
-<script>
-const BOOT_TIME = 2500;
-const consoleEl = document.getElementById("console");
-const output = document.getElementById("console-output");
-const input = document.getElementById("console-input");
-const beep = document.getElementById("beep");
-
-let currentDir = "~";
-const fileSystem = {
-  "~": {
-    type: "folder",
-    children: {
-      projects: {
-        type: "folder",
-        children: {
-          "GP-App.txt": "Photography meets SwiftUI",
-          "Craftify.txt": "Minecraft recipe app for iOS",
-          "CityMart.txt": "Roblox rural store simulation"
-        }
-      },
-      about: {
-        type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent 🇧🇪\nLoves UI, cozy visuals, and console geekery.`
-      },
-      links: {
-        type: "folder",
-        children: {
-          "GitHub.link": "https://github.com/davevancauwenberghe",
-          "YouTube.link": "https://youtube.com/@davevancauwenberghe"
-        }
-      }
-    }
-  }
-};
-
-function writeLine(text = "") {
-  output.innerHTML += text + "\n";
-  window.scrollTo(0, document.body.scrollHeight);
-}
-
-function getDirContent(dir) {
-  const node = getNodeFromPath(dir);
-  if (node?.type === "folder") {
-    return Object.keys(node.children).join("    ");
-  }
-  return "[!] Not a directory.";
-}
-
-function getNodeFromPath(path) {
-  const parts = path.split('/').filter(Boolean);
-  let node = fileSystem["~"];
-  for (let part of parts.slice(1)) {
-    if (node?.children?.[part]) {
-      node = node.children[part];
-    } else return null;
-  }
-  return node;
-}
-
-function handleCommand(raw) {
-  beep.play();
-  const inputLine = `> ${raw}`;
-  writeLine(inputLine);
-
-  const [cmd, ...args] = raw.trim().split(" ");
-  const pathNode = getNodeFromPath(currentDir);
-
-  switch (cmd) {
-    case "help":
-      writeLine(`Commands:
-  help       Show this message
-  ls         List contents
-  cd <dir>   Change directory
-  open <f>   Open file or link
-  clear      Clear screen`);
-      break;
-    case "ls":
-      writeLine(getDirContent(currentDir));
-      break;
-    case "cd":
-      if (!args[0]) {
-        writeLine("Usage: cd <folder>");
-        return;
-      }
-      const nextDir = currentDir + "/" + args[0];
-      const nextNode = getNodeFromPath(nextDir);
-      if (nextNode?.type === "folder") {
-        currentDir = nextDir;
-        writeLine(`Now in ${currentDir}`);
-      } else {
-        writeLine("Folder not found.");
-      }
-      break;
-    case "open":
-      if (!args[0]) {
-        writeLine("Usage: open <file>");
-        return;
-      }
-      const file = pathNode?.children?.[args[0]];
-      if (!file) {
-        writeLine("File not found.");
-      } else if (typeof file === "string") {
-        if (args[0].endsWith(".link")) {
-          writeLine(`Opening link: ${file}`);
-          window.open(file, "_blank");
-        } else {
-          writeLine(file);
-        }
-      } else {
-        writeLine("Can't open a folder.");
-      }
-      break;
-    case "clear":
-      output.innerHTML = "";
-      break;
-    default:
-      writeLine("Unknown command. Type 'help' to see options.");
-  }
-}
-
-// Show system banner on load
-function showBanner() {
-  const now = new Date();
-  writeLine(`Welcome, Dave.`);
-  writeLine(`System time: ${now.toLocaleString()}`);
-  writeLine("Type 'help' to begin.");
-}
-
-// Boot sequence
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.getElementById("boot").style.display = "none";
-    consoleEl.style.display = "block";
-    showBanner();
-  }, BOOT_TIME);
-});
-
-// Command handler
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    const cmd = input.value;
-    input.value = "";
-    handleCommand(cmd);
-  }
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
