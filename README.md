@@ -32,7 +32,7 @@ open <file>    # Open file or external link
 clear / cls    # Clear the screen
 mute / soundoff # Toggle sound effects
 theme          # Toggle light/dark mode
-
+```
 ---
 
 ## ⚙️ Tech Stack
