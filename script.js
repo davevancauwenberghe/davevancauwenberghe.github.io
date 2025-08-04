@@ -1,20 +1,29 @@
-const bootScreen = document.getElementById("boot-screen");
-const terminal = document.getElementById("terminal");
-const output = document.getElementById("console-output");
-const input = document.getElementById("console-input");
-const breadcrumbs = document.getElementById("breadcrumbs");
-
+// script.js
 const sounds = {
   boot: document.getElementById("boot-sound"),
   beep: document.getElementById("beep-sound"),
   open: document.getElementById("open-sound"),
-  error: document.getElementById("error-sound")
+  error: document.getElementById("error-sound"),
+  hum: document.getElementById("hum-sound")
 };
 
-let soundEnabled = true;
-let currentDir = "~";
-let theme = "dark";
+sounds.hum.loop = true;
+sounds.hum.volume = 0.1;
 
+let soundEnabled = true;
+let theme = "dark";
+let currentDir = "~";
+let history = [];
+let historyIndex = -1;
+
+const output = document.getElementById("console-output");
+const input = document.getElementById("console-input");
+const breadcrumbs = document.getElementById("breadcrumbs");
+const terminal = document.getElementById("terminal");
+const bootScreen = document.getElementById("boot-screen");
+const clock = document.getElementById("system-time");
+
+// Simulated file system
 const fileSystem = {
   "~": {
     type: "folder",
@@ -29,7 +38,7 @@ const fileSystem = {
       },
       about: {
         type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent 🇧🇪\nLoves UI, cozy visuals, and console geekery.`
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
       },
       links: {
         type: "folder",
@@ -42,9 +51,11 @@ const fileSystem = {
   }
 };
 
-// Utility
+// Utilities
 function writeLine(text = "") {
-  output.innerHTML += text + "\n";
+  const line = document.createElement("pre");
+  line.textContent = text;
+  output.appendChild(line);
   output.scrollTop = output.scrollHeight;
 }
 
@@ -52,9 +63,8 @@ function getNode(path) {
   const parts = path.split("/").filter(Boolean);
   let node = fileSystem["~"];
   for (let i = 1; i < parts.length; i++) {
-    if (node?.children?.[parts[i]]) {
-      node = node.children[parts[i]];
-    } else return null;
+    node = node.children?.[parts[i]];
+    if (!node) return null;
   }
   return node;
 }
@@ -63,22 +73,40 @@ function getCurrentNode() {
   return getNode(currentDir);
 }
 
-function play(sound) {
-  if (soundEnabled && sounds[sound]) {
-    sounds[sound].currentTime = 0;
-    sounds[sound].play();
+function play(name) {
+  if (soundEnabled && sounds[name]) {
+    sounds[name].currentTime = 0;
+    sounds[name].play();
   }
 }
 
+function setBreadcrumbs() {
+  breadcrumbs.textContent = currentDir;
+}
+
+function updateClock() {
+  const now = new Date().toLocaleString("en-GB", {
+    timeZone: "Europe/Brussels",
+    hour12: false
+  });
+  clock.textContent = `System time: ${now}`;
+}
+
+setInterval(updateClock, 1000);
+
+// Terminal Commands
 function renderDir() {
   const node = getCurrentNode();
   writeLine();
-  Object.entries(node.children).forEach(([name, value]) => {
+  Object.entries(node.children).forEach(([name, val]) => {
+    const line = val.type === "folder" || typeof val === "object"
+      ? `- ${name}/`
+      : `• ${name}`;
     const span = document.createElement("span");
-    span.textContent = value.type === "folder" || typeof value === "object" ? `📁 ${name}` : `📄 ${name}`;
+    span.textContent = line;
     span.classList.add("clickable");
     span.onclick = () => {
-      if (value.type === "folder" || typeof value === "object") {
+      if (val.type === "folder" || typeof val === "object") {
         handleCommand(`cd ${name}`);
       } else {
         handleCommand(`open ${name}`);
@@ -89,40 +117,24 @@ function renderDir() {
   });
 }
 
-function setBreadcrumbs() {
-  breadcrumbs.textContent = currentDir;
-}
-
-function toggleTheme() {
-  theme = theme === "dark" ? "light" : "dark";
-  document.body.classList.toggle("light-mode", theme === "light");
-  writeLine(`Theme set to ${theme}`);
-}
-
-function toggleSound() {
-  soundEnabled = !soundEnabled;
-  writeLine(`Sound ${soundEnabled ? "enabled" : "muted"}`);
-}
-
-// Command Handler
-function handleCommand(inputValue) {
-  const [cmdRaw, ...args] = inputValue.trim().split(" ");
+function handleCommand(raw) {
+  const [cmdRaw, ...args] = raw.trim().split(" ");
   const cmd = cmdRaw.toLowerCase();
 
+  writeLine(`> ${raw}`);
   play("beep");
-  writeLine(`> ${inputValue}`);
 
   switch (cmd) {
     case "help":
     case "?":
       writeLine(`Available commands:
-  help, ?            Show this help message
-  ls, dir            List current directory
-  cd <dir>           Enter folder
-  open <file>        Open file or link
-  clear, cls         Clear console
-  mute, soundoff     Toggle sound
-  theme              Toggle light/dark mode`);
+- help, ?          Show help
+- ls, dir          List folder
+- cd <dir>         Enter folder
+- open <file>      Open file or link
+- clear, cls       Clear screen
+- mute, soundoff   Toggle sound
+- theme            Toggle theme`);
       break;
 
     case "ls":
@@ -131,32 +143,36 @@ function handleCommand(inputValue) {
       break;
 
     case "cd":
-    case "open":
-      if (!args[0]) return writeLine("Usage: cd/open <name>");
-
-      const node = getCurrentNode();
-      const target = node.children?.[args[0]];
-
-      if (!target) {
-        play("error");
-        return writeLine("No such file or folder.");
-      }
-
-      if (target.type === "folder" || typeof target === "object") {
-        currentDir += `/${args[0]}`;
+      if (!args[0]) return writeLine("Usage: cd <folder>");
+      const newPath = `${currentDir}/${args[0]}`;
+      const node = getNode(newPath);
+      if (node?.type === "folder" || typeof node === "object") {
+        currentDir = newPath;
         setBreadcrumbs();
         renderDir();
-      } else if (typeof target === "string") {
-        if (args[0].endsWith(".link")) {
-          play("open");
-          writeLine(`Opening ${target}...`);
-          window.open(target, "_blank");
-        } else {
-          writeLine(target);
-        }
       } else {
         play("error");
-        writeLine("Unknown file type.");
+        writeLine("Folder not found.");
+      }
+      break;
+
+    case "open":
+      if (!args[0]) return writeLine("Usage: open <file>");
+      const file = getCurrentNode().children?.[args[0]];
+      if (!file) {
+        play("error");
+        return writeLine("File not found.");
+      }
+      if (typeof file === "string") {
+        if (args[0].endsWith(".link")) {
+          play("open");
+          writeLine(`Opening ${file}...`);
+          window.open(file, "_blank");
+        } else {
+          writeLine(file);
+        }
+      } else {
+        writeLine("Cannot open a folder.");
       }
       break;
 
@@ -168,37 +184,64 @@ function handleCommand(inputValue) {
     case "mute":
     case "soundoff":
     case "toggle":
-      toggleSound();
+      soundEnabled = !soundEnabled;
+      if (!soundEnabled) {
+        Object.values(sounds).forEach(s => { s.pause?.(); });
+      } else {
+        sounds.hum.play();
+      }
+      writeLine(`Sound ${soundEnabled ? "enabled" : "muted"}`);
       break;
 
     case "theme":
     case "lightmode":
     case "darkmode":
-      toggleTheme();
+      theme = theme === "dark" ? "light" : "dark";
+      document.body.classList.toggle("light-mode", theme === "light");
+      writeLine(`Theme set to ${theme}`);
       break;
 
     default:
       play("error");
-      writeLine(`Unknown command: ${cmd}\nType 'help' to see available commands.`);
+      writeLine(`Unknown command: '${cmd}'\nType 'help' for options.`);
   }
 }
 
-// Init
+// Boot & Keyboard
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const val = input.value.trim();
+    if (val) {
+      history.push(val);
+      historyIndex = history.length;
+      handleCommand(val);
+    }
+    input.value = "";
+  } else if (e.key === "ArrowUp") {
+    if (historyIndex > 0) {
+      historyIndex--;
+      input.value = history[historyIndex] || "";
+    }
+  } else if (e.key === "ArrowDown") {
+    if (historyIndex < history.length - 1) {
+      historyIndex++;
+      input.value = history[historyIndex] || "";
+    } else {
+      input.value = "";
+    }
+  }
+});
+
 window.addEventListener("load", () => {
-  play("boot");
   setTimeout(() => {
     bootScreen.style.display = "none";
     terminal.style.display = "block";
     setBreadcrumbs();
-    writeLine("Welcome, Dave.\nType 'help' or click a folder to browse.");
+    updateClock();
+    play("boot");
+    if (soundEnabled) sounds.hum.play();
+    writeLine("Welcome, Dave.");
+    writeLine("Type 'help' or click a folder to begin.");
     renderDir();
   }, 2500);
-});
-
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    const cmd = input.value.trim();
-    input.value = "";
-    if (cmd) handleCommand(cmd);
-  }
 });
