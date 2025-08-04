@@ -49,7 +49,8 @@ const fileSystem = {
       },
       about: {
         type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent
+Loves UI, cozy visuals, and console geekery.`
       },
       links: {
         type: "folder",
@@ -135,6 +136,8 @@ function handleCommand(raw) {
 - help, ?          Show help
 - ls, dir          List folder
 - cd <dir>         Enter folder
+- cd ..            Go up one level
+- cd /             Go to root
 - open <file>      Open file or link
 - clear, cls       Clear screen
 - mute, soundoff   Toggle sound
@@ -149,6 +152,24 @@ function handleCommand(raw) {
 
     case "cd":
       if (!args[0]) return writeLine("Usage: cd <folder>");
+      if (args[0] === "/") {
+        currentDir = "~";
+        setBreadcrumbs();
+        renderDir();
+        return;
+      }
+      if (args[0] === "..") {
+        const parts = currentDir.split("/");
+        if (parts.length > 1) {
+          parts.pop();
+          currentDir = parts.join("/") || "~";
+        } else {
+          currentDir = "~";
+        }
+        setBreadcrumbs();
+        renderDir();
+        return;
+      }
       const newPath = `${currentDir}/${args[0]}`;
       const node = getNode(newPath);
       if (node?.type === "folder") {
@@ -207,17 +228,18 @@ function handleCommand(raw) {
 
     default:
       play("error");
-      writeLine(`Unknown command: '${cmd}'\nType 'help' for options.`);
+      writeLine(`Unknown command: '${cmd}'
+Type 'help' for options.`);
   }
 }
 
 // Boot log
 function bootLogSequence(callback) {
   let i = 0;
-  const log = document.getElementById("boot-logs");
   const interval = setInterval(() => {
     if (i < bootMessages.length) {
-      log.textContent += bootMessages[i++] + "\n";
+      bootLogs.textContent += bootMessages[i++] + "
+";
     } else {
       clearInterval(interval);
       namePrompt.style.display = "block";
@@ -286,6 +308,14 @@ input.addEventListener("keydown", (e) => {
 // Init
 window.addEventListener("load", () => {
   const stored = localStorage.getItem("dvc_username");
-  if (stored) initTerminal();
-  else bootLogSequence();
+  if (stored) {
+    bootLogs.textContent = `User '${stored}' already logged on.
+Press ENTER to continue.
+`;
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") initTerminal();
+    }, { once: true });
+  } else {
+    bootLogSequence();
+  }
 });

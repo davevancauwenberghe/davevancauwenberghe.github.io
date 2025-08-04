@@ -28,6 +28,7 @@ body {
   line-height: 1.2;
   color: #00ff00;
   margin-bottom: 1rem;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .boot-text {
@@ -45,6 +46,19 @@ body {
   33%  { content: '..'; }
   66%  { content: '...'; }
   100% { content: '.'; }
+}
+
+.boot-log {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  max-height: 150px;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 600px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  color: #00ff00;
 }
 
 /* Terminal container */
@@ -71,12 +85,14 @@ body {
   min-height: 200px;
   margin-bottom: 1rem;
   word-wrap: break-word;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .input-line {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .input-line span {
@@ -124,6 +140,11 @@ body.light-mode .clickable {
   color: #0033cc;
 }
 
+body.light-mode #user-name {
+  border-color: #003300;
+  color: #003300;
+}
+
 /* Responsive layout */
 @media screen and (max-width: 600px) {
   body {
@@ -137,6 +158,11 @@ body.light-mode .clickable {
 
   #console-input {
     width: 100%;
+  }
+
+  .boot-log {
+    max-height: 120px;
+    font-size: 0.85rem;
   }
 }
 
@@ -162,20 +188,15 @@ body.light-mode .clickable {
   width: 180px;
 }
 
-body.light-mode #user-name {
-  border-color: #003300;
-  color: #003300;
-}
-
 /* Flickering cursor effect */
 .cursor {
   display: inline-block;
-  width: 10px;
-  height: 1rem;
+  width: 8px;
+  height: 1.2em;
   background-color: currentColor;
   animation: blink 1s steps(2, start) infinite;
   margin-left: 2px;
-  vertical-align: bottom;
+  vertical-align: baseline;
 }
 
 @keyframes blink {
