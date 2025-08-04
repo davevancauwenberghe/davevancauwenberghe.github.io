@@ -53,7 +53,9 @@ const fileSystem = {
 
 // Utilities
 function writeLine(text = "") {
-  output.innerHTML += text + "\n";
+  const line = document.createElement("pre");
+  line.textContent = text;
+  output.appendChild(line);
   output.scrollTop = output.scrollHeight;
 }
 
