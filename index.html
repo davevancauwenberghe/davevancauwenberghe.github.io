@@ -23,10 +23,14 @@
   </div>
 
   <pre id="boot-logs" class="boot-log"></pre>
+  <span class="cursor"></span>
 
   <div id="name-prompt" style="display:none;">
     <label for="user-name">Enter your name:</label>
-    <input type="text" id="user-name" maxlength="20" autocomplete="off" />
+    <div style="display: inline-flex; align-items: center;">
+      <input type="text" id="user-name" maxlength="20" autocomplete="off" />
+      <span class="cursor"></span>
+    </div>
   </div>
 </div>
 
@@ -38,6 +42,7 @@
   <div class="input-line">
     <span>&gt;</span>
     <input type="text" id="console-input" autofocus autocomplete="off" />
+    <span class="cursor"></span>
   </div>
 </div>
 
