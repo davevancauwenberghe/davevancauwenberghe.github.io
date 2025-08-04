@@ -9,13 +9,12 @@
 </head>
 <body>
 
-<!-- Boot screen -->
 <div id="boot-screen">
   <pre class="ascii-logo">
-      ___  _   __   ___  
-     | _ \| | / /  / _ \ 
-     | v /| |/ /__| (_) |
-     |_|_\|___/____\___/  .
+      __   __   ___  
+     |  \ |  \ | __|
+     | | || | ||__ \
+     |_|_||_|_||___/   .
   </pre>
   <div class="boot-text">Booting dvc<span class="dot-loader"></span></div>
 </div>
@@ -30,6 +29,12 @@
     <input type="text" id="console-input" autofocus autocomplete="off" />
   </div>
 </div>
+
+<audio id="boot-sound" src="sounds/boot.mp3"></audio>
+<audio id="beep-sound" src="sounds/beep.mp3"></audio>
+<audio id="open-sound" src="sounds/open.mp3"></audio>
+<audio id="error-sound" src="sounds/error.mp3"></audio>
+<audio id="hum-sound" src="sounds/hum.mp3" loop></audio>
 
 <script src="script.js"></script>
 </body>
