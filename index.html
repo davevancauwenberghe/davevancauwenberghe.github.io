@@ -17,12 +17,21 @@
      | | || | ||__ \
      |_|_||_|_||___/   .
   </pre>
+
   <div class="boot-text">
     Booting dvc<span class="dot-loader"></span>
   </div>
+
+  <pre id="boot-logs" class="boot-log">
+    <span class="cursor"></span>
+  </pre>
+
   <div id="name-prompt" style="display:none;">
     <label for="user-name">Enter your name:</label>
-    <input type="text" id="user-name" maxlength="20" autocomplete="off" />
+    <div style="display: inline-flex; align-items: center;">
+      <input type="text" id="user-name" maxlength="20" autocomplete="off" />
+      <span class="cursor"></span>
+    </div>
   </div>
 </div>
 
@@ -34,6 +43,7 @@
   <div class="input-line">
     <span>&gt;</span>
     <input type="text" id="console-input" autofocus autocomplete="off" />
+    <span class="cursor"></span>
   </div>
 </div>
 

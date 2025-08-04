@@ -166,3 +166,18 @@ body.light-mode #user-name {
   border-color: #003300;
   color: #003300;
 }
+
+/* Flickering cursor effect */
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1rem;
+  background-color: currentColor;
+  animation: blink 1s steps(2, start) infinite;
+  margin-left: 2px;
+  vertical-align: bottom;
+}
+
+@keyframes blink {
+  to { visibility: hidden; }
+}

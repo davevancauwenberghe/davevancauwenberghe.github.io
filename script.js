@@ -20,9 +20,48 @@ const input = document.getElementById("console-input");
 const breadcrumbs = document.getElementById("breadcrumbs");
 const terminal = document.getElementById("terminal");
 const bootScreen = document.getElementById("boot-screen");
+const bootLogs = document.getElementById("boot-logs");
+const namePrompt = document.getElementById("name-prompt");
+const nameInput = document.getElementById("user-name");
 const clock = document.getElementById("system-time");
 
-// Utilities
+const bootMessages = [
+  "▒▒ Initializing DVC Terminal BIOS v1.91 ▒▒",
+  "▒▒ 640KB RAM | 8-bit Audio Enabled | ANSI MODE ▒▒",
+  "▒▒ [ OK ] Sound chip detected",
+  "▒▒ [ OK ] Display driver: CRT Simulated",
+  "▒▒ [ OK ] Local session storage enabled",
+  "▒▒ Awaiting user authentication..."
+];
+
+// File system
+const fileSystem = {
+  "~": {
+    type: "folder",
+    children: {
+      projects: {
+        type: "folder",
+        children: {
+          "GP-App.txt": "Photography meets SwiftUI",
+          "Craftify.txt": "Minecraft recipe app for iOS",
+          "CityMart.txt": "Roblox rural store simulation"
+        }
+      },
+      about: {
+        type: "file",
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
+      },
+      links: {
+        type: "folder",
+        children: {
+          "GitHub.link": "https://github.com/davevancauwenberghe",
+          "YouTube.link": "https://youtube.com/@davevancauwenberghe"
+        }
+      }
+    }
+  }
+};
+
 function writeLine(text = "") {
   const line = document.createElement("pre");
   line.textContent = text;
@@ -62,63 +101,30 @@ function updateClock() {
   });
   clock.textContent = `System time: ${now}`;
 }
-
 setInterval(updateClock, 1000);
 
-// Simulated file system
-const fileSystem = {
-  "~": {
-    type: "folder",
-    children: {
-      projects: {
-        type: "folder",
-        children: {
-          "GP-App.txt": "Photography meets SwiftUI",
-          "Craftify.txt": "Minecraft recipe app for iOS",
-          "CityMart.txt": "Roblox rural store simulation"
-        }
-      },
-      about: {
-        type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
-      },
-      links: {
-        type: "folder",
-        children: {
-          "GitHub.link": "https://github.com/davevancauwenberghe",
-          "YouTube.link": "https://youtube.com/@davevancauwenberghe"
-        }
-      }
-    }
-  }
-};
-
+// Directory
 function renderDir() {
   const node = getCurrentNode();
   writeLine();
   Object.entries(node.children).forEach(([name, val]) => {
-    const line = val.type === "folder" || typeof val === "object"
-      ? `- ${name}/`
-      : `• ${name}`;
+    const line = val.type === "folder" ? `- ${name}/` : `• ${name}`;
     const span = document.createElement("span");
     span.textContent = line;
     span.classList.add("clickable");
     span.onclick = () => {
-      if (val.type === "folder" || typeof val === "object") {
-        handleCommand(`cd ${name}`);
-      } else {
-        handleCommand(`open ${name}`);
-      }
+      if (val.type === "folder") handleCommand(`cd ${name}`);
+      else handleCommand(`open ${name}`);
     };
     output.appendChild(span);
     output.appendChild(document.createElement("br"));
   });
 }
 
+// Command parser
 function handleCommand(raw) {
   const [cmdRaw, ...args] = raw.trim().split(" ");
   const cmd = cmdRaw.toLowerCase();
-
   writeLine(`> ${raw}`);
   play("beep");
 
@@ -145,7 +151,7 @@ function handleCommand(raw) {
       if (!args[0]) return writeLine("Usage: cd <folder>");
       const newPath = `${currentDir}/${args[0]}`;
       const node = getNode(newPath);
-      if (node?.type === "folder" || typeof node === "object") {
+      if (node?.type === "folder") {
         currentDir = newPath;
         setBreadcrumbs();
         renderDir();
@@ -182,19 +188,13 @@ function handleCommand(raw) {
 
     case "mute":
     case "soundoff":
-    case "toggle":
       soundEnabled = !soundEnabled;
-      if (!soundEnabled) {
-        Object.values(sounds).forEach(s => s.pause?.());
-      } else {
-        sounds.hum.play();
-      }
+      if (!soundEnabled) Object.values(sounds).forEach(s => s.pause?.());
+      else sounds.hum.play();
       writeLine(`Sound ${soundEnabled ? "enabled" : "muted"}`);
       break;
 
     case "theme":
-    case "lightmode":
-    case "darkmode":
       theme = theme === "dark" ? "light" : "dark";
       document.body.classList.toggle("light-mode", theme === "light");
       writeLine(`Theme set to ${theme}`);
@@ -211,35 +211,23 @@ function handleCommand(raw) {
   }
 }
 
-// Prompt name if not set
-function showNamePrompt() {
-  const prompt = document.createElement("div");
-  prompt.id = "name-prompt";
-  prompt.innerHTML = `
-    <label for="user-name">Enter your name:</label>
-    <input id="user-name" type="text" maxlength="16" />
-  `;
-  bootScreen.appendChild(prompt);
-
-  const inputEl = document.getElementById("user-name");
-  inputEl.focus();
-
-  inputEl.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const value = inputEl.value.trim();
-      const badWords = ["fuck", "gay", "nigger", "niggah", "nazi", "root"];
-      const safe = /^[a-zA-Z0-9 _-]+$/.test(value) && !badWords.includes(value.toLowerCase());
-      if (!safe || value.length < 2) {
-        alert("Invalid name. Please choose another.");
-        return;
-      }
-      localStorage.setItem("dvc_username", value);
-      bootScreen.removeChild(prompt);
-      initTerminal();
+// Boot log
+function bootLogSequence(callback) {
+  let i = 0;
+  const log = document.getElementById("boot-logs");
+  const interval = setInterval(() => {
+    if (i < bootMessages.length) {
+      log.textContent += bootMessages[i++] + "\n";
+    } else {
+      clearInterval(interval);
+      namePrompt.style.display = "block";
+      nameInput.focus();
+      if (callback) callback();
     }
-  });
+  }, 600);
 }
 
+// Terminal
 function initTerminal() {
   setTimeout(() => {
     bootScreen.style.display = "none";
@@ -248,24 +236,29 @@ function initTerminal() {
     updateClock();
     play("boot");
     if (soundEnabled) sounds.hum.play();
-
     const name = localStorage.getItem("dvc_username") || "Dave";
     writeLine(`Welcome, ${name}.`);
     writeLine("Type 'help' or click a folder to begin.");
     renderDir();
-  }, 800);
+  }, 1000);
 }
 
-// On load
-window.addEventListener("load", () => {
-  const name = localStorage.getItem("dvc_username");
-  if (name) {
+// Name prompt
+nameInput?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const val = nameInput.value.trim();
+    const banned = ["fuck", "gay", "nigger", "niggah", "nazi", "root"];
+    const isSafe = /^[a-zA-Z0-9 _-]+$/.test(val) && !banned.includes(val.toLowerCase());
+    if (val.length < 2 || !isSafe) {
+      alert("Invalid name. Please choose another.");
+      return;
+    }
+    localStorage.setItem("dvc_username", val);
     initTerminal();
-  } else {
-    showNamePrompt();
   }
 });
 
+// Terminal input
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = input.value.trim();
@@ -288,4 +281,11 @@ input.addEventListener("keydown", (e) => {
       input.value = "";
     }
   }
+});
+
+// Init
+window.addEventListener("load", () => {
+  const stored = localStorage.getItem("dvc_username");
+  if (stored) initTerminal();
+  else bootLogSequence();
 });
