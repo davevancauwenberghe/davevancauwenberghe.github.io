@@ -31,11 +31,21 @@ body {
   font-family: 'Courier New', Courier, monospace;
 }
 
+/* Smaller logo for terminal view */
+.small-logo {
+  font-size: 0.9rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: #00ff00;
+}
+
+/* Boot loader text */
 .boot-text {
   font-size: 1.2rem;
   color: #00ff00;
 }
 
+/* Dot animation */
 .dot-loader::after {
   content: '';
   animation: dots 1.5s infinite steps(3, end);
@@ -48,6 +58,7 @@ body {
   100% { content: '.'; }
 }
 
+/* Boot log output */
 .boot-log {
   margin-top: 1rem;
   font-size: 0.95rem;
@@ -60,6 +71,14 @@ body {
   white-space: pre-wrap;
   color: #00ff00;
   scrollbar-width: thin;
+}
+
+/* Loader message during login */
+#login-loader {
+  margin-top: 1rem;
+  color: #00ff00;
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 /* Terminal container */
@@ -87,6 +106,17 @@ body {
   margin-bottom: 1rem;
   word-wrap: break-word;
   font-family: 'Courier New', Courier, monospace;
+}
+
+/* Input wrapper for styled bar */
+.input-wrapper {
+  background-color: #001100;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  display: inline-block;
+  width: 100%;
+  max-width: 700px;
 }
 
 .input-line {
@@ -165,6 +195,10 @@ body.light-mode #user-name {
   .boot-log {
     max-height: 120px;
     font-size: 0.85rem;
+  }
+
+  .input-wrapper {
+    font-size: 0.95rem;
   }
 }
 
