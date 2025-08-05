@@ -1,4 +1,4 @@
-# davevancauwenberghe.github.io
+# terminalOS
 
 [![CodeQL Advanced](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml)
 ![JavaScript](https://img.shields.io/badge/Language-JavaScript-yellow.svg)
