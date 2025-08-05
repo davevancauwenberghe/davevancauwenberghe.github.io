@@ -59,6 +59,7 @@ body {
   line-height: 1.4;
   white-space: pre-wrap;
   color: #00ff00;
+  scrollbar-width: thin;
 }
 
 /* Terminal container */
@@ -112,6 +113,7 @@ body {
 .clickable {
   color: #00ffff;
   cursor: pointer;
+  display: inline-block;
 }
 
 .clickable:hover {
@@ -195,8 +197,8 @@ body.light-mode #user-name {
   height: 1.2em;
   background-color: currentColor;
   animation: blink 1s steps(2, start) infinite;
-  margin-left: 2px;
-  vertical-align: baseline;
+  margin-left: 4px;
+  vertical-align: text-bottom;
 }
 
 @keyframes blink {

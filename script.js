@@ -26,7 +26,7 @@ const nameInput = document.getElementById("user-name");
 const clock = document.getElementById("system-time");
 
 const bootMessages = [
-  "▒▒ Initializing DVC Terminal BIOS v1.91 ▒▒",
+  "▒▒ Initializing dvc. terminalOS BIOS v0.4.3 ▒▒",
   "▒▒ 640KB RAM | 8-bit Audio Enabled | ANSI MODE ▒▒",
   "▒▒ [ OK ] Sound chip detected",
   "▒▒ [ OK ] Display driver: CRT Simulated",
@@ -34,7 +34,6 @@ const bootMessages = [
   "▒▒ Awaiting user authentication..."
 ];
 
-// File system
 const fileSystem = {
   "~": {
     type: "folder",
@@ -49,8 +48,7 @@ const fileSystem = {
       },
       about: {
         type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent
-Loves UI, cozy visuals, and console geekery.`
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
       },
       links: {
         type: "folder",
@@ -104,7 +102,6 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
-// Directory
 function renderDir() {
   const node = getCurrentNode();
   writeLine();
@@ -122,7 +119,6 @@ function renderDir() {
   });
 }
 
-// Command parser
 function handleCommand(raw) {
   const [cmdRaw, ...args] = raw.trim().split(" ");
   const cmd = cmdRaw.toLowerCase();
@@ -228,18 +224,15 @@ function handleCommand(raw) {
 
     default:
       play("error");
-      writeLine(`Unknown command: '${cmd}'
-Type 'help' for options.`);
+      writeLine(`Unknown command: '${cmd}'\nType 'help' for options.`);
   }
 }
 
-// Boot log
 function bootLogSequence(callback) {
   let i = 0;
   const interval = setInterval(() => {
     if (i < bootMessages.length) {
-      bootLogs.textContent += bootMessages[i++] + "
-";
+      bootLogs.textContent += bootMessages[i++] + "\n";
     } else {
       clearInterval(interval);
       namePrompt.style.display = "block";
@@ -249,7 +242,6 @@ function bootLogSequence(callback) {
   }, 600);
 }
 
-// Terminal
 function initTerminal() {
   setTimeout(() => {
     bootScreen.style.display = "none";
@@ -258,18 +250,17 @@ function initTerminal() {
     updateClock();
     play("boot");
     if (soundEnabled) sounds.hum.play();
-    const name = localStorage.getItem("dvc_username") || "Dave";
+    const name = localStorage.getItem("dvc_username") || "User";
     writeLine(`Welcome, ${name}.`);
     writeLine("Type 'help' or click a folder to begin.");
     renderDir();
   }, 1000);
 }
 
-// Name prompt
 nameInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = nameInput.value.trim();
-    const banned = ["fuck", "gay", "nigger", "niggah", "nazi", "root"];
+    const banned = ["fuck", "gay", "nigger", "nazi", "root"];
     const isSafe = /^[a-zA-Z0-9 _-]+$/.test(val) && !banned.includes(val.toLowerCase());
     if (val.length < 2 || !isSafe) {
       alert("Invalid name. Please choose another.");
@@ -280,7 +271,6 @@ nameInput?.addEventListener("keydown", (e) => {
   }
 });
 
-// Terminal input
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = input.value.trim();
@@ -305,13 +295,10 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-// Init
 window.addEventListener("load", () => {
   const stored = localStorage.getItem("dvc_username");
   if (stored) {
-    bootLogs.textContent = `User '${stored}' already logged on.
-Press ENTER to continue.
-`;
+    bootLogs.textContent = `User '${stored}' already logged on.\nPress ENTER to continue.\n`;
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") initTerminal();
     }, { once: true });
