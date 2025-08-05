@@ -1,3 +1,4 @@
+// script.js
 const sounds = {
   boot: document.getElementById("boot-sound"),
   beep: document.getElementById("beep-sound"),
@@ -24,6 +25,7 @@ const bootLogs = document.getElementById("boot-logs");
 const namePrompt = document.getElementById("name-prompt");
 const nameInput = document.getElementById("user-name");
 const clock = document.getElementById("system-time");
+const loginLoader = document.getElementById("login-loader");
 
 const bootMessages = [
   "▒▒ Initializing dvc. terminalOS BIOS v0.4.3 ▒▒",
@@ -48,7 +50,7 @@ const fileSystem = {
       },
       about: {
         type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent\\nLoves UI, cozy visuals, and console geekery.`
       },
       links: {
         type: "folder",
@@ -135,6 +137,7 @@ function handleCommand(raw) {
 - cd ..            Go up one level
 - cd /             Go to root
 - open <file>      Open file or link
+- search <term>    Search contents
 - clear, cls       Clear screen
 - mute, soundoff   Toggle sound
 - theme            Toggle theme
@@ -198,6 +201,32 @@ function handleCommand(raw) {
       }
       break;
 
+    case "search":
+      const term = args.join(" ").toLowerCase();
+      if (!term) return writeLine("Usage: search <term>");
+
+      let results = [];
+      function searchTree(node, path) {
+        if (node.type === "file" && node.content?.toLowerCase().includes(term)) {
+          results.push(`${path}`);
+        }
+        if (node.type === "folder") {
+          for (const [key, child] of Object.entries(node.children || {})) {
+            searchTree(child, `${path}/${key}`);
+          }
+        }
+      }
+
+      searchTree(fileSystem["~"], "~");
+
+      if (results.length) {
+        writeLine(`Found ${results.length} result(s):`);
+        results.forEach(r => writeLine(`• ${r}`));
+      } else {
+        writeLine("No results found.");
+      }
+      break;
+
     case "clear":
     case "cls":
       output.innerHTML = "";
@@ -224,7 +253,7 @@ function handleCommand(raw) {
 
     default:
       play("error");
-      writeLine(`Unknown command: '${cmd}'\nType 'help' for options.`);
+      writeLine(`Unknown command: '${cmd}'\\nType 'help' for options.`);
   }
 }
 
@@ -232,7 +261,7 @@ function bootLogSequence(callback) {
   let i = 0;
   const interval = setInterval(() => {
     if (i < bootMessages.length) {
-      bootLogs.textContent += bootMessages[i++] + "\n";
+      bootLogs.textContent += bootMessages[i++] + "\\n";
     } else {
       clearInterval(interval);
       namePrompt.style.display = "block";
@@ -243,18 +272,16 @@ function bootLogSequence(callback) {
 }
 
 function initTerminal() {
-  setTimeout(() => {
-    bootScreen.style.display = "none";
-    terminal.style.display = "block";
-    setBreadcrumbs();
-    updateClock();
-    play("boot");
-    if (soundEnabled) sounds.hum.play();
-    const name = localStorage.getItem("dvc_username") || "User";
-    writeLine(`Welcome, ${name}.`);
-    writeLine("Type 'help' or click a folder to begin.");
-    renderDir();
-  }, 1000);
+  bootScreen.style.display = "none";
+  terminal.style.display = "block";
+  setBreadcrumbs();
+  updateClock();
+  play("boot");
+  if (soundEnabled) sounds.hum.play();
+  const name = localStorage.getItem("dvc_username") || "User";
+  writeLine(`Welcome, ${name}.`);
+  writeLine("Type 'help' or click a folder to begin.");
+  renderDir();
 }
 
 nameInput?.addEventListener("keydown", (e) => {
@@ -267,7 +294,9 @@ nameInput?.addEventListener("keydown", (e) => {
       return;
     }
     localStorage.setItem("dvc_username", val);
-    initTerminal();
+    loginLoader.style.display = "block";
+    namePrompt.style.display = "none";
+    setTimeout(() => initTerminal(), 1500);
   }
 });
 
@@ -298,7 +327,7 @@ input.addEventListener("keydown", (e) => {
 window.addEventListener("load", () => {
   const stored = localStorage.getItem("dvc_username");
   if (stored) {
-    bootLogs.textContent = `User '${stored}' already logged on.\nPress ENTER to continue.\n`;
+    bootLogs.textContent = `User '${stored}' already logged on.\\nPress ENTER to continue.\\n`;
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") initTerminal();
     }, { once: true });
