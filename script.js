@@ -1,4 +1,3 @@
-// script.js
 const sounds = {
   boot: document.getElementById("boot-sound"),
   beep: document.getElementById("beep-sound"),
@@ -50,7 +49,7 @@ const fileSystem = {
       },
       about: {
         type: "file",
-        content: `Dave Van Cauwenberghe – Indie dev from Ghent\\nLoves UI, cozy visuals, and console geekery.`
+        content: `Dave Van Cauwenberghe – Indie dev from Ghent\nLoves UI, cozy visuals, and console geekery.`
       },
       links: {
         type: "folder",
@@ -65,7 +64,7 @@ const fileSystem = {
 
 function writeLine(text = "") {
   const line = document.createElement("pre");
-  line.textContent = text;
+  line.innerText = text; // ✅ allows \n to render properly
   output.appendChild(line);
   output.scrollTop = output.scrollHeight;
 }
@@ -137,7 +136,6 @@ function handleCommand(raw) {
 - cd ..            Go up one level
 - cd /             Go to root
 - open <file>      Open file or link
-- search <term>    Search contents
 - clear, cls       Clear screen
 - mute, soundoff   Toggle sound
 - theme            Toggle theme
@@ -201,32 +199,6 @@ function handleCommand(raw) {
       }
       break;
 
-    case "search":
-      const term = args.join(" ").toLowerCase();
-      if (!term) return writeLine("Usage: search <term>");
-
-      let results = [];
-      function searchTree(node, path) {
-        if (node.type === "file" && node.content?.toLowerCase().includes(term)) {
-          results.push(`${path}`);
-        }
-        if (node.type === "folder") {
-          for (const [key, child] of Object.entries(node.children || {})) {
-            searchTree(child, `${path}/${key}`);
-          }
-        }
-      }
-
-      searchTree(fileSystem["~"], "~");
-
-      if (results.length) {
-        writeLine(`Found ${results.length} result(s):`);
-        results.forEach(r => writeLine(`• ${r}`));
-      } else {
-        writeLine("No results found.");
-      }
-      break;
-
     case "clear":
     case "cls":
       output.innerHTML = "";
@@ -253,7 +225,7 @@ function handleCommand(raw) {
 
     default:
       play("error");
-      writeLine(`Unknown command: '${cmd}'\\nType 'help' for options.`);
+      writeLine(`Unknown command: '${cmd}'\nType 'help' for options.`);
   }
 }
 
@@ -261,7 +233,7 @@ function bootLogSequence(callback) {
   let i = 0;
   const interval = setInterval(() => {
     if (i < bootMessages.length) {
-      bootLogs.textContent += bootMessages[i++] + "\\n";
+      bootLogs.innerText += bootMessages[i++] + "\n";
     } else {
       clearInterval(interval);
       namePrompt.style.display = "block";
@@ -289,14 +261,18 @@ nameInput?.addEventListener("keydown", (e) => {
     const val = nameInput.value.trim();
     const banned = ["fuck", "gay", "nigger", "nazi", "root"];
     const isSafe = /^[a-zA-Z0-9 _-]+$/.test(val) && !banned.includes(val.toLowerCase());
+
     if (val.length < 2 || !isSafe) {
       alert("Invalid name. Please choose another.");
       return;
     }
-    localStorage.setItem("dvc_username", val);
-    loginLoader.style.display = "block";
-    namePrompt.style.display = "none";
-    setTimeout(() => initTerminal(), 1500);
+
+    loginLoader?.classList.add("show");
+
+    setTimeout(() => {
+      localStorage.setItem("dvc_username", val);
+      initTerminal();
+    }, 1200); // fake delay
   }
 });
 
@@ -327,7 +303,7 @@ input.addEventListener("keydown", (e) => {
 window.addEventListener("load", () => {
   const stored = localStorage.getItem("dvc_username");
   if (stored) {
-    bootLogs.textContent = `User '${stored}' already logged on.\\nPress ENTER to continue.\\n`;
+    bootLogs.innerText = `User '${stored}' already logged on.\nPress ENTER to continue.\n`;
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") initTerminal();
     }, { once: true });

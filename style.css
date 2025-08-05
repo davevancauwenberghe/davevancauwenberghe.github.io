@@ -108,26 +108,30 @@ body {
   font-family: 'Courier New', Courier, monospace;
 }
 
-/* Input wrapper for styled bar */
+/* Input wrapper like a retro bar */
 .input-wrapper {
-  background-color: #001100;
-  padding: 0.4rem 0.6rem;
   border: 1px solid #00ff00;
-  border-radius: 4px;
-  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  display: flex;
+  align-items: center;
   width: 100%;
   max-width: 700px;
+  background-color: #000000;
+  font-family: 'Courier New', Courier, monospace;
+  box-sizing: border-box;
 }
 
+/* Input line inside wrapper */
 .input-line {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  font-family: 'Courier New', Courier, monospace;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .input-line span {
   margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
 #console-input {
@@ -135,7 +139,7 @@ body {
   border: none;
   color: #00ff00;
   font: inherit;
-  width: 90%;
+  width: 100%;
   outline: none;
 }
 
