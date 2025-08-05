@@ -1,0 +1,25 @@
+name: Build Jekyll site with Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Jekyll Docker Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build site using jekyll/builder Docker image
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/srv/jekyll \
+          -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+          -w /srv/jekyll \
+          jekyll/builder:latest \
+          /bin/bash -c "chmod -R 777 . && bundle install && jekyll build --future"
