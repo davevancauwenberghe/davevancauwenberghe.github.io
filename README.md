@@ -1,5 +1,13 @@
 # terminalOS
 
+```
+ _                      _             _   ___  __    
+| |_ ___ _ __ _ __ ___ (_)_ __   __ _| | /___\/ _\   
+| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | |//  //\ \    
+| ||  __/ |  | | | | | | | | | | (_| | / \_// _\ \   
+ \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_\___/  \__/                                                   
+```
+
 [![CodeQL Advanced](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/davevancauwenberghe/davevancauwenberghe.github.io/actions/workflows/codeql.yml)
 ![JavaScript](https://img.shields.io/badge/Language-JavaScript-yellow.svg)
 [![HTML](https://img.shields.io/badge/HTML-5-orange?logo=html5&logoColor=white&style=flat-square)](#)
